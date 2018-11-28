@@ -11,6 +11,14 @@
 
 ## Prerequisites
 
+If you need an opinionated way of running Firecracker, create an `i3.metal` instance using Ubuntu 18.04 on EC2. Firecracker uses [KVM](https://www.linux-kvm.org) and needs read/write access that can be granted as shown below:
+
+```
+sudo setfacl -m u:${USER}:rw /dev/kvm
+```
+
+The generic requirements are explained below:
+
 - **Linux 4.14+**
 
   Firecracker currently supports physical Linux x86_64 hosts, with kernel
@@ -18,7 +26,7 @@
 
 - **KVM**
 
-  Firecracker uses [KVM](https://www.linux-kvm.org). Please make sure that:
+  Please make sure that:
   1. you have KVM enabled in your Linux kernel, and
   2. you have read/write access to `/dev/kvm`.
      If you need help setting up access to `/dev/kvm`, you should check out
@@ -32,6 +40,12 @@ Firecracker is linked statically against
 just download the latest binary from our
 [release page](https://github.com/firecracker-microvm/firecracker/releases),
 and run it on your x86_64 Linux machine.
+
+On the EC2 instance, this binary can be downloaded as:
+
+```
+curl -L https://github.com/firecracker-microvm/firecracker/releases/download/v0.11.0/firecracker-v0.11.0
+```
 
 If, instead, you'd like to build Firecracker yourself, you should check out
 the [Building From Source section](#building-from-source) in this doc.
@@ -148,6 +162,14 @@ curl --unix-socket /tmp/firecracker.sock -i  \
         "vcpu_count": 2,
         "mem_size_mib": 1024
     }'
+```
+
+Want to spin up 1000s of microVMs on your bare metal instance?
+
+```
+for ((i=0; i<1000; i++)); do
+    ./firecracker-v0.11.0 --api-sock /tmp/firecracker-$i.sock &
+done
 ```
 
 ## Building From Source
